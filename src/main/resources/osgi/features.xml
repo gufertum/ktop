@@ -1,0 +1,9 @@
+<features name="${artifactId}Base"
+          xmlns="http://karaf.apache.org/xmlns/features/v1.3.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0 http://karaf.apache.org/xmlns/features/v1.3.0">
+
+    <feature name="${artifactId}" version="${version}">
+        <bundle>mvn:${groupId}/${artifactId}/${version}</bundle>
+    </feature>
+</features>

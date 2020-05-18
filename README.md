@@ -18,10 +18,37 @@ To build, invoke:
 mvn install
 ```
 
+Bundle-Install
+===
+
 To install in Karaf, invoke from console:
 ```
 install -s mvn:com.savoirtech.karaf.commands/ktop
 ```
+specify version if needed
+```
+install -s mvn:com.savoirtech.karaf.commands/ktop/0.3.0-SNAPSHOT
+```
+
+uninstall
+```
+uninstall <bundle-id>
+```
+
+Alternative Feature-Install
+===
+
+```
+feature:repo-add mvn:com.savoirtech.karaf.commands/ktop/0.3.0-SNAPSHOT/xml/features
+feature:install -v ktop
+```
+
+uninstall
+```
+feature:uninstall ktop
+feature:repo-remove mvn:com.savoirtech.karaf.commands/ktop/0.3.0-SNAPSHOT/xml/features
+```
+
 
 To execute command on Karaf, invoke:
 ```

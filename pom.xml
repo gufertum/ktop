@@ -52,18 +52,19 @@
     </licenses>
 
     <properties>
-
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>1.5</maven.compiler.source>
         <maven.compiler.target>1.5</maven.compiler.target>
-
 
         <junit.version>4.11</junit.version>
         <osgi.version>5.0.0</osgi.version>
         <slf4j.version>1.7.7</slf4j.version>
         <ksh.version>4.2.8</ksh.version>
         <bundle.plugin.version>3.5.0</bundle.plugin.version>
+        <resource.plugin.version>3.1.0</resource.plugin.version>
+        <build.helper.version>3.0.0</build.helper.version>
+        <scm.plugin.version>1.9.5</scm.plugin.version>
     </properties>
 
     <dependencies>
@@ -79,7 +80,6 @@
             <version>${osgi.version}</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.compendium</artifactId>
@@ -109,6 +109,30 @@
 
     <build>
         <plugins>
+            <!-- karaf feature plugin -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>${build.helper.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-artifact</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attach-artifact</goal>
+                        </goals>
+                        <configuration>
+                            <artifacts>
+                                <artifact>
+                                    <file>target/osgi/features.xml</file>
+                                    <type>xml</type>
+                                    <classifier>features</classifier>
+                                </artifact>
+                            </artifacts>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
@@ -118,6 +142,7 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Export-Package>com.savoirtech.karaf.commands*;version=${project.version}</Export-Package>
+                        <Include-Resource>{maven-resources},OSGI-INF=target/OSGI-INF,osgi=target/osgi</Include-Resource>
                         <Import-Package>
                             !com.savoirtech.karaf.commands*,
                             org.apache.aries.blueprint,
@@ -128,8 +153,35 @@
                             org.apache.karaf.shell.console,
                             *
                         </Import-Package>
+                        <!-- remove header Import-Service is necessary for installing via feature:install. This is a restriction for osgi services only -->
+                        <_removeheaders>Import-Service</_removeheaders>
                     </instructions>
                 </configuration>
+            </plugin>
+            <!-- maven resources plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${resource.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <encoding>${project.build.sourceEncoding}</encoding>
+                            <outputDirectory>${basedir}/target</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
