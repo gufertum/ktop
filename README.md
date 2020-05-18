@@ -14,24 +14,22 @@ Building from source:
 ===
 
 To build, invoke:
- 
- mvn install
-
+```
+mvn install
+```
 
 To install in Karaf, invoke from console:
-
- install -s mvn:com.savoirtech.karaf.commands/ktop
-
+```
+install -s mvn:com.savoirtech.karaf.commands/ktop
+```
 
 To execute command on Karaf, invoke:
-
- aetos:ktop
-
+```
+aetos:ktop
+```
 
 To exit ktop: q
-
 To sort by a different column: < or >
-
 To reverse sort: r
 
 
@@ -39,5 +37,4 @@ Runtime Options:
 ===
 
  -t  --threads   number of threads to display. 
- 
  -u  --updates   information update interval in milliseconds.

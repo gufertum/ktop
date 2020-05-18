@@ -32,7 +32,7 @@
     <groupId>com.savoirtech.karaf.commands</groupId>
     <artifactId>ktop</artifactId>
     <packaging>bundle</packaging>
-    <version>0.2.1.M1-SNAPSHOT</version>
+    <version>0.3.0-SNAPSHOT</version>
     <name>Apache Karaf :: Shell aetos/ktop Commands</name>
 
     <description>Provides the OSGi aetos commands</description>
@@ -62,13 +62,14 @@
         <junit.version>4.11</junit.version>
         <osgi.version>5.0.0</osgi.version>
         <slf4j.version>1.7.7</slf4j.version>
+        <ksh.version>4.2.8</ksh.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.karaf.shell</groupId>
             <artifactId>org.apache.karaf.shell.console</artifactId>
-            <version>3.0.0</version>
+            <version>${ksh.version}</version>
         </dependency>
 
         <dependency>

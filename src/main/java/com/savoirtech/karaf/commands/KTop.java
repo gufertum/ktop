@@ -19,61 +19,43 @@
 
 package com.savoirtech.karaf.commands;
 
-import java.io.InputStreamReader;
-import java.lang.management.ClassLoadingMXBean;
-import java.lang.management.GarbageCollectorMXBean;
-import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryMXBean;
-import java.lang.management.OperatingSystemMXBean;
-import java.lang.management.RuntimeMXBean;
-import java.lang.management.ThreadMXBean;
-
-import java.lang.management.ThreadInfo;
-import java.lang.Integer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Formatter;
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.apache.karaf.shell.console.AbstractAction;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.management.*;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.*;
 
 @Command(scope = "aetos", name = "ktop", description = "Karaf Top Command")
 public class KTop extends AbstractAction {
 
-    private int             DEFAULT_REFRESH_INTERVAL = 1000;
-    private int             DEFAULT_KEYBOARD_INTERVAL = 100;
-    private int             numberOfDisplayedThreads = 30; 
-    private long            lastUpTime               = 0;
-    private Map<Long, Long> previousThreadCPUTime = new HashMap<Long, Long>();
+    private int DEFAULT_REFRESH_INTERVAL = 1000;
+    private final int DEFAULT_KEYBOARD_INTERVAL = 100;
+    private int numberOfDisplayedThreads = 30;
+    private long lastUpTime = 0;
+    private final Map<Long, Long> previousThreadCPUTime = new HashMap<Long, Long>();
     private int sortIndex = 3;
     private boolean reverseSort = true;
 
-    @Option(name = "-t", aliases = { "--threads" }, description = "Number of threads to display", required = false, multiValued = false)
+    @Option(name = "-t", aliases = {"--threads"}, description = "Number of threads to display", required = false, multiValued = false)
     private String numThreads;
 
-    @Option(name = "-u", aliases = { "--updates" }, description = "Update interval in milliseconds", required = false, multiValued = false)
+    @Option(name = "-u", aliases = {"--updates"}, description = "Update interval in milliseconds", required = false, multiValued = false)
     private String updates;
 
 
     protected Object doExecute() throws Exception {
         if (numThreads != null) {
-             numberOfDisplayedThreads = Integer.parseInt(numThreads);
+            numberOfDisplayedThreads = Integer.parseInt(numThreads);
         }
         if (updates != null) {
-             DEFAULT_REFRESH_INTERVAL = Integer.parseInt(updates);
-        } 
+            DEFAULT_REFRESH_INTERVAL = Integer.parseInt(updates);
+        }
         try {
             RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
             OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
@@ -87,7 +69,7 @@ public class KTop extends AbstractAction {
         return null;
     }
 
-    private void KTop(RuntimeMXBean runtime, OperatingSystemMXBean os, ThreadMXBean threads, 
+    private void KTop(RuntimeMXBean runtime, OperatingSystemMXBean os, ThreadMXBean threads,
                       MemoryMXBean mem, ClassLoadingMXBean cl) throws InterruptedException, IOException {
 
         Thread.currentThread().setName("ktop");
@@ -99,7 +81,7 @@ public class KTop extends AbstractAction {
             clearScreen();
             printOperatingSystemHeader(os);
             printThreadsHeader(runtime, threads);
-            printGCHeader(); 
+            printGCHeader();
             printClassLoaderHeader(cl);
             printJVMHeader(mem);
             System.out.println("\u001B[36m==========================================================================================\u001B[0m");
@@ -160,8 +142,8 @@ public class KTop extends AbstractAction {
 
     private void printOperatingSystemHeader(OperatingSystemMXBean os) {
         System.out.printf(" \u001B[1mktop\u001B[0m - %8tT, %6s, %2d cpus, %15.15s",
-                          new Date(), os.getArch(), os.getAvailableProcessors(), 
-                          os.getName() + " "  + os.getVersion());
+                new Date(), os.getArch(), os.getAvailableProcessors(),
+                os.getName() + " " + os.getVersion());
         if (os.getSystemLoadAverage() != -1) {
             System.out.printf(", CPU load avg %3.2f%n", os.getSystemLoadAverage());
         } else {
@@ -171,28 +153,28 @@ public class KTop extends AbstractAction {
 
     private void printThreadsHeader(RuntimeMXBean runtime, ThreadMXBean threads) {
         System.out.printf(" UpTime: %-7s #Threads: %-4d #ThreadsPeak: %-4d #ThreadsCreated: %-4d %n",
-                          timeUnitToHoursMinutes(MILLISECONDS, runtime.getUptime()), threads.getThreadCount(),
-                          threads.getPeakThreadCount(),
-                          threads.getTotalStartedThreadCount());
+                timeUnitToHoursMinutes(MILLISECONDS, runtime.getUptime()), threads.getThreadCount(),
+                threads.getPeakThreadCount(),
+                threads.getTotalStartedThreadCount());
     }
 
     private void printGCHeader() {
         for (GarbageCollectorMXBean gc : ManagementFactory.getGarbageCollectorMXBeans()) {
             float time = gc.getCollectionTime();
             System.out.printf(" Garbage collector: Name: %s Collections: %-5d Time: %5.3f ms %n",
-                              gc.getName(), gc.getCollectionCount(), time );
+                    gc.getName(), gc.getCollectionCount(), time);
         }
     }
 
     private void printClassLoaderHeader(ClassLoadingMXBean cl) {
         System.out.printf(" #CurrentClassesLoaded: %-8d #TotalClassesLoaded: %-8d #TotalClassesUnloaded: %-8d %n",
-                          cl.getLoadedClassCount(), cl.getTotalLoadedClassCount(), cl.getUnloadedClassCount());
+                cl.getLoadedClassCount(), cl.getTotalLoadedClassCount(), cl.getUnloadedClassCount());
     }
 
     private void printJVMHeader(MemoryMXBean mem) {
         System.out.printf(" JVM Memory: HEAP:%5s /%5s NONHEAP:%5s /%5s%n",
-                          bToMB(mem.getHeapMemoryUsage().getUsed()), bToMB(mem.getHeapMemoryUsage().getMax()) ,
-                          bToMB(mem.getNonHeapMemoryUsage().getUsed()), bToMB(mem.getNonHeapMemoryUsage().getMax()));
+                bToMB(mem.getHeapMemoryUsage().getUsed()), bToMB(mem.getHeapMemoryUsage().getMax()),
+                bToMB(mem.getNonHeapMemoryUsage().getUsed()), bToMB(mem.getNonHeapMemoryUsage().getMax()));
     }
 
     private void printTopThreads(ThreadMXBean threads, RuntimeMXBean runtime) {
@@ -225,12 +207,12 @@ public class KTop extends AbstractAction {
             }
 
             System.out.printf(" %6d %-40s  %13s %5.2f%% %8s %5s %n",
-                              stats.get(tid)[0],
-                              stats.get(tid)[1],
-                              stats.get(tid)[2],
-                              stats.get(tid)[3],
-                              stats.get(tid)[4],
-                              stats.get(tid)[5]);
+                    stats.get(tid)[0],
+                    stats.get(tid)[1],
+                    stats.get(tid)[2],
+                    stats.get(tid)[3],
+                    stats.get(tid)[4],
+                    stats.get(tid)[5]);
         }
     }
 
@@ -248,8 +230,7 @@ public class KTop extends AbstractAction {
 
                 if (previousThreadCPUTime.containsKey(tid)) {
                     deltaThreadCpuTime = threadCpuTime - previousThreadCPUTime.get(tid);
-                }
-                else {
+                } else {
                     deltaThreadCpuTime = threadCpuTime;
                 }
 
@@ -286,7 +267,7 @@ public class KTop extends AbstractAction {
         }
 
         List result = new ArrayList();
-        for (Iterator<Map.Entry> it = list.iterator(); it.hasNext();) {
+        for (Iterator<Map.Entry> it = list.iterator(); it.hasNext(); ) {
             result.add(it.next().getKey());
         }
         return result;
@@ -312,7 +293,7 @@ public class KTop extends AbstractAction {
     }
 
     public String bToMB(long bytes) {
-        if(bytes<0) {
+        if (bytes < 0) {
             return "n/a";
         }
         return "" + (bytes / 1024 / 1024) + "m";
